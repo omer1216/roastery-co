@@ -1,8 +1,5 @@
 import { Fraunces, Inter } from "next/font/google";
-import Nav from "@/components/Nav";
-import Footer from "@/components/Footer";
-import CartDrawer from "@/components/cart/CartDrawer";
-import { CartProvider } from "@/context/CartContext";
+import SiteChrome from "@/components/SiteChrome";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -27,12 +24,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${fraunces.variable} ${inter.variable}`}>
       <body className="min-h-screen">
-        <CartProvider>
-          <Nav />
-          <main>{children}</main>
-          <Footer />
-          <CartDrawer />
-        </CartProvider>
+        <SiteChrome>{children}</SiteChrome>
       </body>
     </html>
   );

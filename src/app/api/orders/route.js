@@ -149,7 +149,7 @@ export async function POST(request) {
       total,
       status: "pending",
     })
-    .select("id, reference, total, created_at")
+        .select("id, reference, total, subtotal, delivery_fee, order_type, delivery_address, notes, created_at")
     .single();
 
   if (insertError) {
