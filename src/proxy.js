@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 const COOKIE = "roastery_admin";
 
-export function middleware(request) {
+export function proxy(request) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get(COOKIE)?.value;
   const authed = Boolean(token) && token === process.env.ADMIN_SESSION_TOKEN;
