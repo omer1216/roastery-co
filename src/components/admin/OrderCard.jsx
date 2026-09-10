@@ -10,7 +10,7 @@ function minutesAgo(iso) {
 }
 
 const ACTION_LABEL = {
-  new: "Confirm",
+  pending: "Confirm",
   confirmed: "Start preparing",
   preparing: "Mark ready",
 };
