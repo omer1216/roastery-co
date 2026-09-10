@@ -100,21 +100,34 @@ export default function CheckoutForm() {
     return (
       <div className="mt-16 rounded-2xl border border-white/5 bg-roastery-panel p-12 text-center">
         <h2 className="font-heading text-3xl text-roastery-text">
-          Order placed
+          Order received
         </h2>
         <p className="mt-4 text-sm text-roastery-muted">Your order number</p>
         <p className="mt-1 font-heading text-2xl text-roastery-accent-text">
           {placedOrder?.reference}
         </p>
         <p className="mx-auto mt-6 max-w-md text-sm leading-relaxed text-roastery-muted">
-          The bar has it. Someone will call to confirm in the next few minutes.
+          The bar has it. You&apos;ll see it move from confirmed to ready on the
+          tracking page as we work through it.
         </p>
-        <Link
-          href="/menu"
-          className="mt-9 inline-block rounded-full bg-roastery-accent px-7 py-3 text-sm font-medium text-roastery-bg transition-colors hover:bg-roastery-accent-text"
-        >
-          Back to the menu
-        </Link>
+
+        {placedOrder?.reference ? (
+          <Link
+            href={`/order/${placedOrder.reference}`}
+            className="mt-9 inline-block rounded-full bg-roastery-accent px-7 py-3 text-sm font-medium text-roastery-bg transition-colors hover:bg-roastery-accent-text"
+          >
+            Track this order
+          </Link>
+        ) : null}
+
+        <div className="mt-5">
+          <Link
+            href="/menu"
+            className="text-sm text-roastery-muted transition-colors hover:text-roastery-text"
+          >
+            Back to the menu
+          </Link>
+        </div>
       </div>
     );
   }

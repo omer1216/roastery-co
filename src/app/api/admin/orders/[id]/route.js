@@ -1,10 +1,20 @@
 import { NextResponse } from "next/server";
-import { advanceOrder } from "@/lib/orders";
+import { advanceOrder, rejectOrder } from "@/lib/orders";
 
 export async function PATCH(request, { params }) {
   try {
     const { id } = await params;
-    const result = await advanceOrder(id);
+    const body = await request.json().catch(() => ({}));
+    const action = body.action ?? "advance";
+
+    let result;
+    if (action === "reject") {
+      result = await rejectOrder(id, body.reason);
+    } else if (action === "advance") {
+      result = await advanceOrder(id);
+    } else {
+      return NextResponse.json({ error: "Unknown action." }, { status: 400 });
+    }
 
     if (result.error) {
       return NextResponse.json({ error: result.error }, { status: result.status });

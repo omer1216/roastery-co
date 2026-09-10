@@ -62,22 +62,29 @@ export default function OrdersBoard({ initialOrders }) {
 
     return {
       ordersToday: today.length,
-      revenueToday: today.reduce((sum, order) => sum + Number(order.total || 0), 0),
+      revenueToday: today
+        .filter((order) => order.status !== "cancelled")
+        .reduce((sum, order) => sum + Number(order.total || 0), 0),
       completedToday: durations.length,
       avgPrepMinutes: durations.length
         ? Math.round(durations.reduce((a, b) => a + b, 0) / durations.length)
         : null,
       pendingNow: orders.filter((order) =>
         ["pending", "confirmed", "preparing"].includes(order.status)
-        ).length,
+      ).length,
     };
   }, [orders]);
 
-  async function handleAdvance(id) {
+  async function patchOrder(id, body) {
     setBusyId(id);
     setError("");
 
-    const response = await fetch(`/api/admin/orders/${id}`, { method: "PATCH" });
+    const response = await fetch(`/api/admin/orders/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
     const data = await response.json().catch(() => ({}));
 
     if (response.ok && data.order) {
@@ -90,6 +97,8 @@ export default function OrdersBoard({ initialOrders }) {
 
     setBusyId(null);
   }
+
+  const cancelled = orders.filter((order) => order.status === "cancelled");
 
   return (
     <div className="space-y-8">
@@ -120,9 +129,7 @@ export default function OrdersBoard({ initialOrders }) {
 
       <MetricCards metrics={metrics} />
 
-      {error ? (
-        <p className="font-body text-sm text-red-400">{error}</p>
-      ) : null}
+      {error ? <p className="font-body text-sm text-red-400">{error}</p> : null}
 
       <div className="grid gap-4 lg:grid-cols-4">
         {COLUMNS.map((column) => {
@@ -146,13 +153,18 @@ export default function OrdersBoard({ initialOrders }) {
 
               <div className="mt-4 space-y-3">
                 {columnOrders.length === 0 ? (
-                  <p className="font-body text-xs text-roastery-muted">Nothing here.</p>
+                  <p className="font-body text-xs text-roastery-muted">
+                    Nothing here.
+                  </p>
                 ) : (
                   columnOrders.map((order) => (
                     <OrderCard
                       key={order.id}
                       order={order}
-                      onAdvance={handleAdvance}
+                      onAdvance={(id) => patchOrder(id, { action: "advance" })}
+                      onReject={(id, reason) =>
+                        patchOrder(id, { action: "reject", reason })
+                      }
                       busy={busyId === order.id}
                     />
                   ))
@@ -162,6 +174,25 @@ export default function OrdersBoard({ initialOrders }) {
           );
         })}
       </div>
+
+      {cancelled.length > 0 ? (
+        <section className="rounded-2xl border border-white/10 bg-roastery-panel p-4">
+          <h2 className="font-heading text-sm uppercase tracking-[0.15em] text-roastery-muted">
+            Cancelled today · {cancelled.length}
+          </h2>
+          <ul className="mt-3 space-y-2">
+            {cancelled.map((order) => (
+              <li
+                key={order.id}
+                className="flex flex-wrap gap-x-3 font-body text-xs text-roastery-muted"
+              >
+                <span className="text-roastery-text">{order.reference}</span>
+                <span>{order.rejection_reason}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
     </div>
   );
 }
