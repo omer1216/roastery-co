@@ -9,6 +9,7 @@ import { describeCustomizations, deliveryFeeFor } from "@/lib/cart";
 const EMPTY = {
   name: "",
   phone: "",
+  email: "",
   orderType: "pickup",
   address: "",
   notes: "",
@@ -25,6 +26,12 @@ function validate(values) {
   const digits = values.phone.replace(/\D/g, "");
   if (!digits) errors.phone = "Required";
   else if (digits.length < 10) errors.phone = "Doesn't look like a full number";
+
+  const email = values.email.trim();
+  if (!email) errors.email = "Required";
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+    errors.email = "Doesn't look like a valid email";
+  }
 
   if (values.orderType === "delivery" && !values.address.trim()) {
     errors.address = "Required for delivery";
@@ -68,6 +75,7 @@ export default function CheckoutForm() {
           })),
           customer_name: values.name.trim(),
           phone: values.phone.trim(),
+          customer_email: values.email.trim(),
           order_type: values.orderType,
           delivery_address:
             values.orderType === "delivery" ? values.address.trim() : null,
@@ -193,6 +201,32 @@ export default function CheckoutForm() {
           {errors.phone && (
             <p className="mt-2 text-xs text-red-400">{errors.phone}</p>
           )}
+        </div>
+
+        <div>
+          <label
+            htmlFor="email"
+            className="block text-xs uppercase tracking-[0.15em] text-roastery-muted"
+          >
+            Email
+          </label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            autoComplete="email"
+            placeholder="you@example.com"
+            value={values.email}
+            onChange={handleChange}
+            disabled={isSubmitting}
+            className={`mt-2 ${inputClasses}`}
+          />
+          {errors.email && (
+            <p className="mt-2 text-xs text-red-400">{errors.email}</p>
+          )}
+          <p className="mt-2 text-xs text-roastery-muted/70">
+            We&apos;ll send your receipt and tracking link here.
+          </p>
         </div>
 
         <div>
