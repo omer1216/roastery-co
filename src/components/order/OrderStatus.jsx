@@ -17,6 +17,8 @@ const STEPS = [
   },
 ];
 
+const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
+
 export default function OrderStatus({ initialOrder }) {
   const [order, setOrder] = useState(initialOrder);
   const [live, setLive] = useState(false);
@@ -37,6 +39,12 @@ export default function OrderStatus({ initialOrder }) {
   const cancelled = order.status === "cancelled";
   const currentIndex = STEPS.findIndex((step) => step.status === order.status);
   const items = Array.isArray(order.items) ? order.items : [];
+
+  const whatsappHref = WHATSAPP_NUMBER
+    ? `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+        `Hi, I'm checking on order ${order.reference}.`
+      )}`
+    : null;
 
   return (
     <div>
@@ -150,6 +158,16 @@ export default function OrderStatus({ initialOrder }) {
           </div>
         </div>
       </div>
+      {whatsappHref && !cancelled ? (
+          <a
+            href={whatsappHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-6 flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-roastery-panel px-6 py-4 font-body text-sm text-roastery-muted transition-colors hover:border-roastery-accent/40 hover:text-roastery-text"
+          >
+            Message us about this order
+          </a>
+        ) : null}
     </div>
   );
 }
