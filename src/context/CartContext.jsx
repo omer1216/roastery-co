@@ -37,7 +37,7 @@ export function CartProvider({ children }) {
     }
   }, [lines, hydrated]);
 
-  function addItem(item, customizations = {}, quantity = 1) {
+  function addItem(item, customizations = {}, quantity = 1, options = {}) {
     const lineId = buildLineId(item.id, customizations);
     const unitPrice = lineUnitPrice(item, customizations);
 
@@ -66,7 +66,7 @@ export function CartProvider({ children }) {
       ];
     });
 
-    setIsOpen(true);
+      if (!options.silent) setIsOpen(true);
   }
 
   function updateQuantity(lineId, quantity) {
