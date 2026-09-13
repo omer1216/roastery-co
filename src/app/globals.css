@@ -134,3 +134,32 @@ textarea:-webkit-autofill {
 ::-webkit-scrollbar-thumb:hover {
   background-color: var(--color-roastery-accent);
 }
+
+@keyframes marquee-left {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes marquee-right {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+
+.marquee-track {
+  animation: marquee-left 60s linear infinite;
+}
+
+.marquee-track-reverse {
+  animation: marquee-right 72s linear infinite;
+}
+
+.marquee-paused {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track,
+  .marquee-track-reverse {
+    animation: none;
+  }
+}
