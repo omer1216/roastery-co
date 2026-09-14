@@ -29,7 +29,7 @@ const STEPS = [
 
 export default function HowItWorks() {
   return (
-    <section className="mt-24 border-y border-white/5 bg-roastery-panel">
+    <section className=" border-y border-white/5 bg-roastery-panel">
       <div className="mx-auto grid max-w-6xl gap-10 px-6 py-16 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
         {STEPS.map(({ id, title, body, Icon }) => (
           <div key={id} className="flex gap-4">

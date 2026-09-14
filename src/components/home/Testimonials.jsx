@@ -98,7 +98,7 @@ export default function Testimonials() {
   const [paused, setPaused] = useState(false);
 
   return (
-    <section className="overflow-hidden py-24">
+    <section className="overflow-hidden py-0">
       <div className="mx-auto max-w-6xl px-6">
         <p className="font-body text-xs uppercase tracking-[0.2em] text-roastery-muted">
           What people say

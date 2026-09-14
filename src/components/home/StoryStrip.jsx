@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function StoryStrip() {
   return (
-    <section className="mx-auto max-w-6xl px-6 py-28">
+    <section className="mx-auto max-w-6xl px-6 ">
       <div className="grid items-center gap-12 md:grid-cols-2 md:gap-16">
         <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-roastery-panel">
           <Image

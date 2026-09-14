@@ -14,18 +14,26 @@ export default async function HomePage() {
   return (
     <>
       <Hero />
-      <Reveal>
-        <HowItWorks />
-      </Reveal>
-      <Reveal>
-        <StoryStrip />
-      </Reveal>
-      <Reveal>
-        <SignaturePicks items={popularItems} />
-      </Reveal>
-      <Reveal>
+
+      <div className="space-y-24">
+        <Reveal>
+          <HowItWorks />
+        </Reveal>
+
+        <Reveal>
+          <StoryStrip />
+        </Reveal>
+
+        <Reveal>
+          <SignaturePicks items={popularItems} />
+        </Reveal>
+
         <Testimonials />
-      </Reveal>
+      </div>
+
+      <div className="mx-auto max-w-6xl px-6 py-20">
+        <div className="h-px bg-gradient-to-r from-transparent via-roastery-accent/25 to-transparent" />
+      </div>
     </>
   );
 }

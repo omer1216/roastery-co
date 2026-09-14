@@ -36,8 +36,8 @@ function FacebookIcon(props) {
 }
 
 const SOCIALS = [
-  { label: "Instagram", href: "https://instagram.com", Icon: InstagramIcon },
-  { label: "Facebook", href: "https://facebook.com", Icon: FacebookIcon },
+  { label: "Instagram", href: "https://www.instagram.com/omershahzad_1411/", Icon: InstagramIcon },
+  { label: "Facebook", href: "https://www.facebook.com/profile.php?id=100010832975728", Icon: FacebookIcon },
 ];
 
 const MENU_LINKS = [
@@ -154,7 +154,7 @@ export default function Footer() {
               <li className="flex gap-3">
                 <Mail size={16} className="mt-0.5 shrink-0 text-roastery-muted" />
                 <a
-                  href="mailto:hello@theroasteryco.pk"
+                  href="mailto:mosfyp@gmail.com"
                   className="text-roastery-muted transition-colors hover:text-roastery-text"
                 >
                   hello@theroasteryco.pk
