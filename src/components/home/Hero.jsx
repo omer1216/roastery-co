@@ -35,7 +35,7 @@ export default function Hero() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-6">
+      <div className="mx-auto max-w-7xl px-6 pb-16 sm:pb-24">
         <div className="animate-fade-up delay-400 relative aspect-[16/9] w-full overflow-hidden rounded-2xl bg-roastery-panel sm:aspect-[21/9]">
           <Image
             src="/images/hero.jpg"
