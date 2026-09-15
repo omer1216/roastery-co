@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useCart } from "@/context/CartContext";
+import OptionPicker from "./OptionPicker";
 
 const GREETING =
   "Morning. Ask me anything about the menu, or just tell me what you want.";
@@ -18,6 +19,8 @@ export default function ChatWidget() {
   const [history, setHistory] = useState([]);
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
+  const [pending, setPending] = useState(null);
+  const [adding, setAdding] = useState(false);
 
   const scrollRef = useRef(null);
   const inputRef = useRef(null);
@@ -30,7 +33,7 @@ export default function ChatWidget() {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages, busy]);
+  }, [messages, busy, pending]);
 
   useEffect(() => {
     if (open && inputRef.current) inputRef.current.focus();
@@ -44,7 +47,7 @@ export default function ChatWidget() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
 
-    useEffect(() => {
+  useEffect(() => {
     if (!open) return;
 
     function onPointerDown(event) {
@@ -78,6 +81,51 @@ export default function ChatWidget() {
     return touched;
   }
 
+  async function handleConfirm(choices) {
+    if (!pending) return;
+
+    setAdding(true);
+
+    try {
+      const response = await fetch("/api/chat/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          menuItemId: pending.menuItemId,
+          quantity: pending.quantity,
+          customizations: choices,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.action) {
+        applyActions([data.action]);
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant",
+            text: `Added. ${pending.quantity} × ${pending.name}.`,
+            showCart: true,
+          },
+        ]);
+        setPending(null);
+      } else {
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", text: data.error || "Couldn't add that." },
+        ]);
+      }
+    } catch {
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", text: "Lost connection there. Try again." },
+      ]);
+    } finally {
+      setAdding(false);
+    }
+  }
+
   async function send() {
     const text = draft.trim();
     if (!text || busy) return;
@@ -85,6 +133,7 @@ export default function ChatWidget() {
     setMessages((prev) => [...prev, { role: "user", text }]);
     setDraft("");
     setBusy(true);
+    setPending(null);
 
     try {
       const response = await fetch("/api/chat", {
@@ -120,6 +169,7 @@ export default function ChatWidget() {
         { role: "assistant", text: data.reply, showCart: changed },
       ]);
       setHistory(data.history ?? []);
+      setPending(data.pending ?? null);
     } catch {
       setMessages((prev) => [
         ...prev,
@@ -153,8 +203,10 @@ export default function ChatWidget() {
       </button>
 
       {open ? (
-        <div 
-        ref={panelRef}className="fixed bottom-24 right-6 z-[60] flex h-[min(32rem,calc(100vh-8rem))] w-[min(24rem,calc(100vw-3rem))] flex-col overflow-hidden rounded-2xl border border-white/10 bg-roastery-panel shadow-2xl">
+        <div
+          ref={panelRef}
+          className="fixed bottom-24 right-6 z-[60] flex h-[min(32rem,calc(100vh-8rem))] w-[min(24rem,calc(100vw-3rem))] flex-col overflow-hidden rounded-2xl border border-white/10 bg-roastery-panel shadow-2xl"
+        >
           <header className="border-b border-white/10 px-5 py-4">
             <p className="font-heading text-sm text-roastery-text">The bar</p>
             <p className="font-body text-xs text-roastery-muted">
@@ -190,9 +242,25 @@ export default function ChatWidget() {
               </div>
             ))}
 
+            {pending && !busy ? (
+              <OptionPicker
+                pending={pending}
+                onConfirm={handleConfirm}
+                busy={adding}
+              />
+            ) : null}
+
             {busy ? (
-              <div className="w-fit rounded-2xl rounded-bl-sm bg-roastery-bg px-4 py-2 font-body text-sm text-roastery-muted">
-                ...
+              <div className="flex w-fit items-center gap-1.5 rounded-2xl rounded-bl-sm bg-roastery-bg px-4 py-3">
+                <span className="typing-dot h-1.5 w-1.5 rounded-full bg-roastery-accent-text" />
+                <span
+                  className="typing-dot h-1.5 w-1.5 rounded-full bg-roastery-accent-text"
+                  style={{ animationDelay: "0.15s" }}
+                />
+                <span
+                  className="typing-dot h-1.5 w-1.5 rounded-full bg-roastery-accent-text"
+                  style={{ animationDelay: "0.3s" }}
+                />
               </div>
             ) : null}
           </div>

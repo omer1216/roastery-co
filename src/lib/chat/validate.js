@@ -74,6 +74,34 @@ function resolveCustomizations(item, args) {
   return { customizations: result };
 }
 
+function optionGroups(item, args) {
+  const allowed = item.customizations ?? {};
+  const groups = [];
+  let anyUnspecified = false;
+
+  const push = (key, label, values, asked) => {
+    if (!Array.isArray(values) || values.length < 2) return;
+    groups.push({ key, label, values, selected: asked ?? null });
+    if (!asked) anyUnspecified = true;
+  };
+
+  push("size", "Size", allowed.sizes, args.size);
+  push("milk", "Milk", allowed.milk, args.milk);
+  push("sweetness", "Sweetness", allowed.sweetness, args.sweetness);
+
+  if (item.temperature === "both") {
+    groups.push({
+      key: "temperature",
+      label: "Serve",
+      values: ["hot", "iced"],
+      selected: args.temperature ?? null,
+    });
+    if (!args.temperature) anyUnspecified = true;
+  }
+
+  return anyUnspecified ? groups : null;
+}
+
 export function validateToolCall({ name, args, menuItems, cartLines }) {
   if (name === "add_to_cart") {
     const item = findMenuItem(menuItems, args.item_name);
@@ -89,6 +117,23 @@ export function validateToolCall({ name, args, menuItems, cartLines }) {
     const quantity = Number(args.quantity);
     if (!Number.isInteger(quantity) || quantity < 1 || quantity > 20) {
       return { ok: false, error: "Quantity has to be a whole number from 1 to 20." };
+    }
+
+    if (!args.__resolved) {
+      const groups = optionGroups(item, args);
+
+      if (groups) {
+        return {
+          ok: false,
+          pending: {
+            menuItemId: item.id,
+            name: item.name,
+            quantity,
+            groups,
+          },
+          error: `Waiting on the customer to pick options for ${item.name}. Do not add it yet. Say one short line like "pick how you want it" and stop.`,
+        };
+      }
     }
 
     const resolved = resolveCustomizations(item, args);

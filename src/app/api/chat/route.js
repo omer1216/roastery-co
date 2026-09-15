@@ -75,6 +75,7 @@ function textFromSteps(steps) {
 async function runConversation({ systemPrompt, startingInput, menuItems, cartLines }) {
   let input = startingInput;
   const actions = [];
+  let pending = null;
   let interaction = null;
 
   for (let round = 0; round <= MAX_TOOL_ROUNDS; round++) {
@@ -115,6 +116,10 @@ async function runConversation({ systemPrompt, startingInput, menuItems, cartLin
 
       if (outcome.ok) actions.push(outcome.action);
 
+      // First item still waiting on the customer to choose options.
+      // Only one picker is shown at a time, so later ones are dropped.
+      if (outcome.pending && !pending) pending = outcome.pending;
+
       input.push({
         type: "function_result",
         name: call.name,
@@ -133,7 +138,7 @@ async function runConversation({ systemPrompt, startingInput, menuItems, cartLin
     });
   }
 
-  return { interaction, actions, input };
+  return { interaction, actions, pending, input };
 }
 
 export async function POST(request) {
@@ -193,6 +198,7 @@ export async function POST(request) {
     return NextResponse.json({
       reply: textFromSteps(steps) || "Sorry, didn't catch that.",
       actions: result.actions,
+      pending: result.pending ?? null,
       history: trimHistory(result.input, MAX_HISTORY_STEPS),
     });
   } catch (error) {
