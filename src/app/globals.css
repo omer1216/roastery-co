@@ -12,12 +12,24 @@
   --font-body: var(--font-inter), system-ui, sans-serif;
 }
 
+:root {
+  --cursor-dot: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22'%3E%3Ccircle cx='11' cy='11' r='7' fill='none' stroke='%23e9ddc9' stroke-width='1.5'/%3E%3Ccircle cx='11' cy='11' r='3' fill='%23b8834f'/%3E%3C/svg%3E") 11 11;
+}
+
 body {
   background-color: var(--color-roastery-bg);
   color: var(--color-roastery-text);
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
-  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Ccircle cx='8' cy='8' r='6' fill='%239c6a3e'/%3E%3C/svg%3E") 8 8, auto;
+  cursor: var(--cursor-dot), auto;
+}
+
+a,
+button,
+[role="button"],
+label,
+summary {
+  cursor: var(--cursor-dot), pointer;
 }
 
 input,
@@ -41,6 +53,7 @@ textarea:-webkit-autofill {
   caret-color: var(--color-roastery-text);
   transition: background-color 9999s ease-in-out 0s;
 }
+
 @keyframes fade-up {
   from {
     opacity: 0;
@@ -81,6 +94,16 @@ textarea:-webkit-autofill {
   }
 }
 
+@keyframes marquee-left {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes marquee-right {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+
 .animate-fade-up {
   animation: fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
@@ -102,14 +125,16 @@ textarea:-webkit-autofill {
 .delay-300 { animation-delay: 0.3s; }
 .delay-400 { animation-delay: 0.4s; }
 
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
+.marquee-track {
+  animation: marquee-left 60s linear infinite;
+}
+
+.marquee-track-reverse {
+  animation: marquee-right 72s linear infinite;
+}
+
+.marquee-paused {
+  animation-play-state: paused;
 }
 
 * {
@@ -135,29 +160,15 @@ textarea:-webkit-autofill {
   background-color: var(--color-roastery-accent);
 }
 
-@keyframes marquee-left {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
-}
-
-@keyframes marquee-right {
-  from { transform: translateX(-50%); }
-  to { transform: translateX(0); }
-}
-
-.marquee-track {
-  animation: marquee-left 60s linear infinite;
-}
-
-.marquee-track-reverse {
-  animation: marquee-right 72s linear infinite;
-}
-
-.marquee-paused {
-  animation-play-state: paused;
-}
-
 @media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
   .marquee-track,
   .marquee-track-reverse {
     animation: none;
