@@ -35,9 +35,13 @@ export default function ChatWidget() {
     }
   }, [messages, busy, pending]);
 
+  // Focus returns when the panel opens and whenever a reply or an add
+  // finishes, so nobody has to click back into the input.
   useEffect(() => {
-    if (open && inputRef.current) inputRef.current.focus();
-  }, [open]);
+    if (open && !busy && !adding && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [open, busy, adding]);
 
   useEffect(() => {
     function onKeyDown(event) {
@@ -272,12 +276,11 @@ export default function ChatWidget() {
                 value={draft}
                 onChange={(event) => setDraft(event.target.value)}
                 onKeyDown={(event) => {
-                  if (event.key === "Enter") send();
+                  if (event.key === "Enter" && !busy) send();
                 }}
                 maxLength={500}
                 placeholder="What can I get you?"
-                disabled={busy}
-                className="flex-1 rounded-lg border border-white/10 bg-roastery-bg px-3 py-2 font-body text-sm text-roastery-text placeholder:text-roastery-muted/50 outline-none focus:border-roastery-accent disabled:opacity-60"
+                className="flex-1 rounded-lg border border-white/10 bg-roastery-bg px-3 py-2 font-body text-sm text-roastery-text placeholder:text-roastery-muted/50 outline-none focus:border-roastery-accent"
               />
               <button
                 type="button"
