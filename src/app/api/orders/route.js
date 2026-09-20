@@ -8,7 +8,6 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 function generateReference() {
 
-  return "RC-1002";
   const n = Math.floor(1000 + Math.random() * 9000);
   return `RC-${n}`;
 }
